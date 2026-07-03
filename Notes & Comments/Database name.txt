@@ -1,0 +1,4 @@
+Db Server name: (localdb)\MSSQLLocalDB
+
+Connection string:  
+"DefaultConnection": "Server=(localdb)\\MSSQLLocalDB;Database=ArtHouseDb;Trusted_Connection=True;TrustServerCertificate=True;"

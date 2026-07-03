@@ -1,0 +1,41 @@
+﻿@model List<ArtHouse.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<h2 class="mb-3">🎨 ArtHouse Products</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Title</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model != null && Model.Any())
+        {
+            foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Title</td>
+                    <td>@item.Category?.Name</td>
+                    <td>@item.Price.ToString("N0")</td>
+                    <td>@item.Stock</td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="4" class="text-center text-muted">
+                    No products found
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

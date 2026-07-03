@@ -1,0 +1,13 @@
+// Reason line1: Joining AppDbContext to Dependency Injection, it means: ASP.NET Core will create and manage this class. 
+// And also (Option) will specify the setting of DbContext.
+// ... line 2: Will define SQL Server as my database.
+// ... line 3: Will read the path of database from (appsettings.json)!
+
+The above explanation is for the following code from program.cs:>
+
+// Add Entity Framework Core DbContext to DI container
+// Configured to use SQL Server with connection string from appsettings.json
+(And the above explanation is the more professional one!)
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")));

@@ -1,0 +1,151 @@
+﻿@* @model ArtHouse.Models.Product *@
+@model ArtHouse.ViewModels.Products.ProductCreateViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+
+<h2>Create a new Product 🎨</h2>
+
+
+<div class="container mt-5 mb-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-dark text-white">
+
+                    <h3 class="mb-0">
+                        Create New Product
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    @* if we won't write enctupe imageFile will be null *@
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="text-danger mb-3">
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label asp-for="Title" class="form-label"></label>
+
+                            <input asp-for="Title" class="form-control" />
+
+                            <span asp-validation-for="Title"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label asp-for="Description" class="form-label"></label>
+
+                            <textarea asp-for="Description"
+                                      class="form-control"
+                                      rows="4"></textarea>
+
+                            <span asp-validation-for="Description"
+                                  class="text-danger"></span>
+
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Price" class="form-label"></label>
+                            <input asp-for="Price" class="form-control" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Stock" class="form-label"></label>
+                            <input asp-for="Stock" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+
+                            <input asp-for="Image" type="file" class="form-control" accept=".jpg,.jpeg,.png"/>
+
+                        </div>
+
+                        @* // This piece of code shows a preview of the choosen photo from user!!! *@
+                        <div class="mb-3 text-center">
+
+                            <img id="previewImage"
+                                 src="https://placehold.co/300x200?text=No+Image"
+                                 class="img-thumbnail"
+                                 style="max-height:250px;" />
+
+                        </div>
+
+                        <div class="mb-3">
+
+                            <label asp-for="CategoryId" class="form-label"></label>
+
+                            <select asp-for="CategoryId"
+                                    asp-items="Model.Categories"
+                                    class="form-control">
+
+                                <option value="">-- Select Category --</option>
+
+                            </select>
+
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+
+                            <button type="submit"
+                                    class="btn btn-success">
+
+                                Save Product
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <script>
+
+        const imageInput = document.querySelector('input[name="imageFile"]');
+        const previewImage = document.getElementById("previewImage");
+
+        imageInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+            if (!file) return;
+            const imageUrl = URL.createObjectURL(file);
+            previewImage.src = imageUrl;
+
+        });
+
+    </script>
+
+}
+@* // Comment1:
+//  document.getElementById(...) = We use ElementById because it works with a unique id so we have faster operation! But querySelector() can work with classes, ids, names, tags, attributes so it's a bit slower
+// Comment2:
+// We use Events for a time when the user has done something and we want to react to the user's action.
+// Comment3:
+// We could use onclick here instead of addEventListener but the second one could have more connections of Event with other elements if we had!
+
+*@
