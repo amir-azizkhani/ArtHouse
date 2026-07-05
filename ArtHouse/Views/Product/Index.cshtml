@@ -32,20 +32,35 @@
             @foreach (var item in Model.Products)
             {
                 <tr>
-                    <td>@item.Title</td>
 
                     <td>
                         @if (!string.IsNullOrEmpty(item.ImageUrl))
                         {
-                            <img src="@item.ImageUrl" style="width:60px;height:60px;object-fit:cover;" />
+                            <img src="@item.ImageUrl"
+                                 style="width:60px;height:60px;object-fit:cover;" />
                         }
                     </td>
 
-                    <td>@item.CategoryName</td>
+                    <td>@item.Title</td>
 
                     <td>@item.Price.ToString("N0")</td>
 
                     <td>@item.Stock</td>
+
+                    <td>@item.CategoryName</td>
+
+                    <td>
+
+                        <a asp-action="Edit"
+                           asp-route-id="@item.Id"
+                           class="btn btn-warning btn-sm">
+
+                            Edit
+
+                        </a>
+
+                    </td>
+
                 </tr>
             }
 

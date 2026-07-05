@@ -19,11 +19,52 @@ namespace ArtHouse.Controllers
 
         #region Our Private Methods
 
-        #region
-
+        #region LoadCategories
         private void LoadCategories()
         {
             ViewBag.Categories = _context.Categories.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Name }).ToList();
+        }
+        #endregion
+
+        #region SaveImage
+
+        private string SaveImage(IFormFile image)
+        {
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+
+            var path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "images",
+                fileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                image.CopyTo(stream);
+            }
+
+            return "/images/" + fileName;
+        }
+
+        #endregion
+
+        #region DeleteImage
+
+        private void DeleteImage(string? imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return;
+
+            var imagePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                imageUrl.TrimStart('/')
+            );
+
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
         }
 
         #endregion
@@ -31,27 +72,6 @@ namespace ArtHouse.Controllers
         #endregion
 
 
-
-            //public IActionResult Index()
-            //{
-            //    var products = _context.Products.Include(p => p.Category).Select(p => new ProductItemViewModel
-            //                                                                    {
-            //                                                                        Id = p.Id,
-            //                                                                        Title = p.Title,
-            //                                                                        Price = p.Price,
-            //                                                                        Stock = p.Stock,
-            //                                                                        ImageUrl = p.ImageUrl,
-            //                                                                        CategoryName = p.Category.Name
-            //                                                                    }).ToList();
-
-            //    var viewModel = new ProductListViewModel
-            //    {
-            //        Products = products,
-            //        TotalCount = products.Count
-            //    };
-
-            //    return View(viewModel);
-            //}
 
         public IActionResult Index(string? search)
         {
@@ -114,22 +134,18 @@ namespace ArtHouse.Controllers
                 CategoryId = model.CategoryId
             };
 
+            if (model.Image == null)
+            {
+                Console.WriteLine("Image is NULL");
+            }
+            else
+            {
+                Console.WriteLine(model.Image.FileName);
+            }
+
             if (model.Image != null && model.Image.Length > 0)
             {
-                var fileName = Guid.NewGuid().ToString()
-                    + Path.GetExtension(model.Image.FileName);
-
-                var path = Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot/images",
-                    fileName);
-
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    model.Image.CopyTo(stream);
-                }
-
-                product.ImageUrl = "/images/" + fileName;
+                product.ImageUrl = SaveImage(model.Image);
             }
 
             _context.Products.Add(product);
@@ -138,9 +154,76 @@ namespace ArtHouse.Controllers
             return RedirectToAction("Index");
         }
 
+        //********************
+
+
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var product = _context.Products.FirstOrDefault(p => p.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ProductEditViewModel
+            {
+                Id = product.Id,
+                Title = product.Title,
+                Description = product.Description,
+                Price = product.Price,
+                Stock = product.Stock,
+                CategoryId = product.CategoryId,
+                ExistingImageUrl = product.ImageUrl
+            };
+
+            LoadCategories(model);
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Edit(ProductEditViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                LoadCategories(model);
+
+                return View(model);
+            }
+
+            var product = _context.Products.FirstOrDefault(p => p.Id == model.Id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            product.Title = model.Title;
+            product.Description = model.Description;
+            product.Price = model.Price;
+            product.Stock = model.Stock;
+            product.CategoryId = model.CategoryId;
+
+            if (model.Image != null && model.Image.Length > 0)
+            {
+                DeleteImage(product.ImageUrl);
+
+                product.ImageUrl = SaveImage(model.Image);
+            }
+
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
 
 
 
+
+        //********************
 
         private void LoadCategories(ProductCreateViewModel model)
         {
