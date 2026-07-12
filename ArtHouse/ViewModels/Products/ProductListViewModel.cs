@@ -1,4 +1,4 @@
-﻿namespace ArtHouse.ViewModels
+﻿namespace ArtHouse.ViewModels.Products
 {
     public class ProductListViewModel
     {

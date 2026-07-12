@@ -17,62 +17,7 @@ namespace ArtHouse.Controllers
             _context = context;
         }
 
-        #region Our Private Methods
-
-        #region LoadCategories
-        private void LoadCategories()
-        {
-            ViewBag.Categories = _context.Categories.Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.Name }).ToList();
-        }
-        #endregion
-
-        #region SaveImage
-
-        private string SaveImage(IFormFile image)
-        {
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
-
-            var path = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                "images",
-                fileName);
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                image.CopyTo(stream);
-            }
-
-            return "/images/" + fileName;
-        }
-
-        #endregion
-
-        #region DeleteImage
-
-        private void DeleteImage(string? imageUrl)
-        {
-            if (string.IsNullOrEmpty(imageUrl))
-                return;
-
-            var imagePath = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                imageUrl.TrimStart('/')
-            );
-
-            if (System.IO.File.Exists(imagePath))
-            {
-                System.IO.File.Delete(imagePath);
-            }
-        }
-
-        #endregion
-
-        #endregion
-
-
-
+        #region Read
         public IActionResult Index(string? search)
         {
             var query = _context.Products.Include(p => p.Category).AsQueryable();
@@ -103,9 +48,11 @@ namespace ArtHouse.Controllers
 
             return View(viewModel);
         }
+        #endregion
 
         //********************
 
+        #region Create
         public IActionResult Create()
         {
 
@@ -154,8 +101,11 @@ namespace ArtHouse.Controllers
             return RedirectToAction("Index");
         }
 
+        #endregion
+
         //********************
 
+        #region Edit
 
         [HttpGet]
         public IActionResult Edit(int id)
@@ -220,11 +170,66 @@ namespace ArtHouse.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-
-
+        #endregion
 
         //********************
 
+        #region Delete
+
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+
+            var product = _context.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            var model = new ProductDeleteViewModel
+            {
+                Id = product.Id,
+                Title = product.Title,
+                Price = product.Price,
+                ImageUrl = product.ImageUrl,
+
+                CategoryName = product.Category?.Name ?? string.Empty
+            };
+
+            return View(model);
+
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Delete(ProductDeleteViewModel model)
+        {
+
+            var product = _context.Products.FirstOrDefault(p => p.Id == model.Id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            DeleteImage(product.ImageUrl);
+
+            _context.Products.Remove(product);
+
+            _context.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        #endregion
+
+        //********************
+
+        #region Our Private Methods
+
+        #region LoadCategories
         private void LoadCategories(ProductCreateViewModel model)
         {
             model.Categories = _context.Categories
@@ -235,6 +240,52 @@ namespace ArtHouse.Controllers
                 })
                 .ToList();
         }
+        #endregion
+
+        #region SaveImage
+
+        private string SaveImage(IFormFile image)
+        {
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+
+            var path = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                "images",
+                fileName);
+
+            using (var stream = new FileStream(path, FileMode.Create))
+            {
+                image.CopyTo(stream);
+            }
+
+            return "/images/" + fileName;
+        }
+
+        #endregion
+
+        #region DeleteImage
+
+        private void DeleteImage(string? imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return;
+
+            var imagePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot",
+                imageUrl.TrimStart('/')
+            );
+
+            if (System.IO.File.Exists(imagePath))
+            {
+                System.IO.File.Delete(imagePath);
+            }
+        }
+
+        #endregion
+
+        #endregion
 
     }
 }

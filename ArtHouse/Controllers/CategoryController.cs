@@ -1,6 +1,7 @@
 ﻿using ArtHouse.Data;
-using Microsoft.AspNetCore.Mvc;
 using ArtHouse.Models;
+using ArtHouse.ViewModels.Category;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ArtHouse.Controllers
 {
@@ -11,11 +12,45 @@ namespace ArtHouse.Controllers
         {
             _context = context;
         }
+
+
+        #region Read
+
         public IActionResult Index()
         {
-            var category = _context.Categories.ToList();
-            return View(category);
+            var model = new CategoryListViewModel();
+
+            model.Categories = _context.Categories
+                .Select(c => new CategoryItemViewModel
+                {
+                    Name = c.Name,
+                    Id = c.Id
+                })
+                .ToList();
+
+            return View(model);
         }
+
+        #endregion
+
+        //*************************
+
+        #region Create
+
+        //[HttpGet]
+        //public IActionResult Create()
+        //{
+        //    var model = new CategoryCreateViewModel();
+
+        //    model.Name
+
+        //    return View(model);
+        //}
+
+
+        #endregion
+
+
     }
 }
 
