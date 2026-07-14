@@ -1,4 +1,5 @@
 using ArtHouse.Data;
+using ArtHouse.Services;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -13,6 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ImageService>();
 
 var app = builder.Build();
 

@@ -1,5 +1,6 @@
 ﻿using ArtHouse.Data;
 using ArtHouse.Models;
+using ArtHouse.Services;
 using ArtHouse.ViewModels;
 using ArtHouse.ViewModels.Products;
 using Microsoft.AspNetCore.Mvc;
@@ -12,9 +13,11 @@ namespace ArtHouse.Controllers
     public class ProductController : Controller
     {
         private readonly AppDbContext _context;
-        public ProductController(AppDbContext context)
+        private readonly ImageService _imageService;
+        public ProductController(AppDbContext context, ImageService imageService)
         {
             _context = context;
+            _imageService = imageService;
         }
 
         #region Read
@@ -92,7 +95,7 @@ namespace ArtHouse.Controllers
 
             if (model.Image != null && model.Image.Length > 0)
             {
-                product.ImageUrl = SaveImage(model.Image);
+                product.ImageUrl = _imageService.SaveImage(model.Image);
             }
 
             _context.Products.Add(product);
@@ -160,9 +163,9 @@ namespace ArtHouse.Controllers
 
             if (model.Image != null && model.Image.Length > 0)
             {
-                DeleteImage(product.ImageUrl);
+                _imageService.DeleteImage(product.ImageUrl);
 
-                product.ImageUrl = SaveImage(model.Image);
+                product.ImageUrl = _imageService.SaveImage(model.Image);
             }
 
             _context.SaveChanges();
@@ -214,7 +217,7 @@ namespace ArtHouse.Controllers
                 return NotFound();
             }
 
-            DeleteImage(product.ImageUrl);
+            _imageService.DeleteImage(product.ImageUrl);
 
             _context.Products.Remove(product);
 
@@ -240,49 +243,6 @@ namespace ArtHouse.Controllers
                 })
                 .ToList();
         }
-        #endregion
-
-        #region SaveImage
-
-        private string SaveImage(IFormFile image)
-        {
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
-
-            var path = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                "images",
-                fileName);
-
-            using (var stream = new FileStream(path, FileMode.Create))
-            {
-                image.CopyTo(stream);
-            }
-
-            return "/images/" + fileName;
-        }
-
-        #endregion
-
-        #region DeleteImage
-
-        private void DeleteImage(string? imageUrl)
-        {
-            if (string.IsNullOrEmpty(imageUrl))
-                return;
-
-            var imagePath = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot",
-                imageUrl.TrimStart('/')
-            );
-
-            if (System.IO.File.Exists(imagePath))
-            {
-                System.IO.File.Delete(imagePath);
-            }
-        }
-
         #endregion
 
         #endregion

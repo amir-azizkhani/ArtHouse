@@ -1,0 +1,74 @@
+﻿@model ArtHouse.ViewModels.Category.CategoryCreateViewModel
+
+<h2>Create New Category 🖼️</h2>
+
+<div class="container mt-5 mb-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-dark text-white">
+
+                    <h3 class="mb-0">
+                        Create New Category
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form asp-action="Create"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <partial name="_CategoryForm"
+                                 model="Model" />
+
+                        <div class="d-flex justify-content-end">
+
+                            <button type="submit"
+                                    class="btn btn-success">
+
+                                Save Category
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+
+    <script>
+
+        const imageInput=document.getElementById("Image");
+        const previewImage=document.getElementById("previewImage");
+
+        imageInput.addEventListener("change",function(){
+
+        const file=this.files[0];
+
+        if(!file) return;
+
+        previewImage.src=URL.createObjectURL(file);
+
+        });
+
+    </script>
+
+}

@@ -1,0 +1,81 @@
+﻿@model ArtHouse.ViewModels.Category.CategoryEditViewModel
+
+<div class="container mt-5 mb-5">
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-8">
+
+            <div class="card shadow">
+
+                <div class="card-header bg-warning">
+
+                    <h3 class="mb-0">
+                        Edit Category
+                    </h3>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form asp-action="Edit"
+                          method="post"
+                          enctype="multipart/form-data">
+
+                        <input asp-for="Id" type="hidden" />
+
+                        <input asp-for="ExistingImageUrl" type="hidden" />
+
+                        <partial name="_CategoryForm" model="Model" />
+
+                        <div class="d-flex justify-content-end">
+
+                            <button type="submit"
+                                    class="btn btn-warning">
+
+                                Update Category
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+@section Scripts
+{
+    <script>
+
+        const imageInput = document.getElementById("Image");
+        const previewImage = document.getElementById("previewImage");
+
+        if ("@Model.ExistingImageUrl" !== "")
+        {
+            previewImage.src = "@Model.ExistingImageUrl";
+        }
+
+        imageInput.addEventListener("change", function () {
+
+            const file = this.files[0];
+
+            if (!file) return;
+
+            previewImage.src = URL.createObjectURL(file);
+
+        });
+
+    </script>
+}
