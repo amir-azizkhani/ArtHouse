@@ -3,6 +3,7 @@ using ArtHouse.Models;
 using ArtHouse.Services;
 using ArtHouse.ViewModels.Category;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ArtHouse.Controllers
 {
@@ -39,7 +40,7 @@ namespace ArtHouse.Controllers
         //*************************
 
         #region Create
-
+        [Authorize]
         [HttpGet]
         public IActionResult Create()
         {
@@ -48,6 +49,7 @@ namespace ArtHouse.Controllers
             return View(model);
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(CategoryCreateViewModel model)
@@ -79,6 +81,7 @@ namespace ArtHouse.Controllers
 
         #region Edit
 
+        [Authorize]
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -99,7 +102,7 @@ namespace ArtHouse.Controllers
             return View(model);
         }
 
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(CategoryEditViewModel model)
@@ -137,6 +140,7 @@ namespace ArtHouse.Controllers
 
         #region Delete
 
+        [Authorize]
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -157,6 +161,7 @@ namespace ArtHouse.Controllers
             return View(model);
         }
 
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(CategoryDeleteViewModel model)

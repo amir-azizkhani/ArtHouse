@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ArtHouse.Controllers
 {
@@ -56,6 +57,8 @@ namespace ArtHouse.Controllers
         //********************
 
         #region Create
+        [Authorize]
+        [HttpGet]
         public IActionResult Create()
         {
 
@@ -66,6 +69,8 @@ namespace ArtHouse.Controllers
             return View(model);
         }
 
+
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(ProductCreateViewModel model)
@@ -109,7 +114,7 @@ namespace ArtHouse.Controllers
         //********************
 
         #region Edit
-
+        [Authorize]
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -136,7 +141,7 @@ namespace ArtHouse.Controllers
             return View(model);
         }
 
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(ProductEditViewModel model)
@@ -178,7 +183,7 @@ namespace ArtHouse.Controllers
         //********************
 
         #region Delete
-
+        [Authorize]
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -204,7 +209,7 @@ namespace ArtHouse.Controllers
 
         }
 
-
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(ProductDeleteViewModel model)
