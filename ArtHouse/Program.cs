@@ -1,8 +1,9 @@
 using ArtHouse.Data;
-using ArtHouse.Services;
-using Microsoft.EntityFrameworkCore;
+using ArtHouse.Data.Seed;
 using ArtHouse.Identity;
+using ArtHouse.Services;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,12 @@ builder.Services
     .AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -43,5 +50,16 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    
+    await IdentitySeeder.SeedAsync(roleManager, userManager);
+}
 
 app.Run();

@@ -57,7 +57,7 @@ namespace ArtHouse.Controllers
         //********************
 
         #region Create
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Create()
         {
@@ -70,7 +70,7 @@ namespace ArtHouse.Controllers
         }
 
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(ProductCreateViewModel model)
@@ -114,7 +114,7 @@ namespace ArtHouse.Controllers
         //********************
 
         #region Edit
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -141,7 +141,7 @@ namespace ArtHouse.Controllers
             return View(model);
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(ProductEditViewModel model)
@@ -183,7 +183,7 @@ namespace ArtHouse.Controllers
         //********************
 
         #region Delete
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public IActionResult Delete(int id)
         {
@@ -209,7 +209,7 @@ namespace ArtHouse.Controllers
 
         }
 
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Delete(ProductDeleteViewModel model)

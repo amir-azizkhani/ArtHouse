@@ -47,7 +47,7 @@ namespace ArtHouse.Controllers
 
             if (result.Succeeded)
             {
-                return RedirectToAction("Register");
+                return RedirectToAction("Index", "Home");
             }
 
             foreach (var error in result.Errors)
@@ -110,7 +110,14 @@ namespace ArtHouse.Controllers
 
         #endregion
 
+        #region AccessDenied
 
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
+        #endregion
 
 
     }
