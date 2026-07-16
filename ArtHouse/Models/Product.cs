@@ -28,6 +28,8 @@ namespace ArtHouse.Models
         public int CategoryId { get; set; }
 
         public Category? Category { get; set; }
+
+        public ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     }
 }
 
