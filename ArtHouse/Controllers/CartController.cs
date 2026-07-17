@@ -128,7 +128,7 @@ namespace ArtHouse.Controllers
 
         #endregion
 
-        #region
+        #region Remove
 
         [HttpPost]
         public async Task<IActionResult> Remove(int cartItemId)

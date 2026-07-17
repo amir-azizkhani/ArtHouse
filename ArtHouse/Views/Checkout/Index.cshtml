@@ -1,0 +1,131 @@
+﻿@model ArtHouse.ViewModels.Orders.CheckoutViewModel
+
+<div class="container mt-5 mb-5">
+
+    <h2 class="mb-4">
+        Checkout
+    </h2>
+
+    <div class="row">
+
+        <div class="col-md-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    Order Summary
+                </div>
+
+
+                <div class="card-body">
+
+
+                    @foreach (var item in Model.Items)
+                    {
+                        <div class="d-flex align-items-center mb-3">
+
+                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                            {
+                                <img src="@item.ImageUrl"
+                                     style="width:80px;height:80px;object-fit:cover;"
+                                     class="rounded me-3" />
+                            }
+
+
+                            <div>
+
+                                <h5 class="mb-1">
+                                    @item.Title
+                                </h5>
+
+
+                                <div>
+                                    Quantity:
+                                    @item.Quantity
+                                </div>
+
+
+                                <div>
+                                    Price:
+                                    @item.Price.ToString("N0")
+                                </div>
+
+
+                                <div>
+                                    Sub Total:
+                                    @item.SubTotal.ToString("N0")
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <hr />
+                    }
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="col-md-4">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+                    Summary
+                </div>
+
+
+                <div class="card-body">
+
+                    <p>
+                        Total Items:
+                        <strong>
+                            @Model.TotalItems
+                        </strong>
+                    </p>
+
+
+                    <p>
+                        Total Price:
+                        <strong>
+                            @Model.TotalPrice.ToString("N0")
+                        </strong>
+                    </p>
+
+                    <a asp-controller="Product"
+                       asp-action="Index"
+                       class="btn btn-outline-secondary w-100 mb-2">
+
+                        Continue Shopping
+
+                    </a>
+
+                    <form asp-controller="Checkout"
+                          asp-action="PlaceOrder"
+                          method="post">
+
+                        <button type="submit"
+                                class="btn btn-success w-100">
+
+                            Place Order
+
+                        </button>
+
+                    </form>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>

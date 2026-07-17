@@ -1,0 +1,52 @@
+﻿@model ArtHouse.Models.Order
+
+
+<div class="container mt-5">
+
+    <div class="card shadow-sm text-center">
+
+        <div class="card-body p-5">
+
+            <h1 class="text-success mb-4">
+                🎉 Order Completed Successfully
+            </h1>
+
+
+            <p class="fs-5">
+                Thank you for your purchase.
+            </p>
+
+
+            <hr />
+
+
+            <p>
+                Order Number:
+                <strong>
+                    #@Model.Id
+                </strong>
+            </p>
+
+
+            <p>
+                Total Price:
+                <strong>
+                    @Model.TotalPrice.ToString("N0")
+                </strong>
+            </p>
+
+
+            <a asp-controller="Product"
+               asp-action="Index"
+               class="btn btn-primary mt-3">
+
+                Continue Shopping
+
+            </a>
+
+
+        </div>
+
+    </div>
+
+</div>

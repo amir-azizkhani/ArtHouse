@@ -30,6 +30,16 @@ namespace ArtHouse.Data
                    .HasOne(ci => ci.Product)
                    .WithMany(p => p.CartItems)
                    .HasForeignKey(ci => ci.ProductId);
+
+            builder.Entity<Order>()
+                   .HasOne(o => o.User)
+                   .WithMany(u => u.Orders)
+                   .HasForeignKey(o => o.UserId);
+
+            builder.Entity<OrderItem>()
+                   .HasOne(oi => oi.Order)
+                   .WithMany(o => o.OrderItems)
+                   .HasForeignKey(oi => oi.OrderId);
         }
 
         public DbSet<Product> Products { get; set; }
@@ -39,6 +49,10 @@ namespace ArtHouse.Data
         public DbSet<Cart> Carts { get; set; }
 
         public DbSet<CartItem> CartItems { get; set; }
+
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderItem> OrderItems { get; set; }
 
 
     }
