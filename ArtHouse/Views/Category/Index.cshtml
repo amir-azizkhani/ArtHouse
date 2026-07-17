@@ -6,9 +6,12 @@
 
         <h2>Category List</h2>
 
-        <a asp-action="Create" class="btn btn-primary">
-            + Create New Category
-        </a>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary">
+                + Create New Category
+            </a>
+        }
 
     </div>
 
@@ -19,7 +22,13 @@
             <tr>
                 <th>Id</th>
                 <th>Name</th>
-                <th>Actions</th>
+                <th>Products</th>
+
+                @if (User.IsInRole("Admin"))
+                {
+                    <th>Actions</th>
+                }
+
             </tr>
 
         </thead>
@@ -30,24 +39,45 @@
             {
                 <tr>
 
-
                     <td>@item.Id</td>
 
                     <td>@item.Name</td>
 
-                    <td class="text-nowrap">
-                        <a asp-action="Edit"
-                           asp-route-id="@item.Id"
-                           class="btn btn-warning btn-sm me-2">
-                            Edit
+                    <td>
+
+                        <a asp-controller="Product"
+                           asp-action="Index"
+                           asp-route-categoryId="@item.Id"
+                           class="btn btn-info btn-sm">
+
+                            👁 View Products
+
                         </a>
 
-                        <a asp-action="Delete"
-                           asp-route-id="@item.Id"
-                           class="btn btn-danger btn-sm">
-                            Delete
-                        </a>
                     </td>
+
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <td class="text-nowrap">
+
+                            <a asp-action="Edit"
+                               asp-route-id="@item.Id"
+                               class="btn btn-warning btn-sm me-2">
+
+                                Edit
+
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@item.Id"
+                               class="btn btn-danger btn-sm">
+
+                                Delete
+
+                            </a>
+
+                        </td>
+                    }
 
                 </tr>
             }

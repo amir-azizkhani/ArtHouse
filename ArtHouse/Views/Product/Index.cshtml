@@ -6,9 +6,36 @@
 
         <h2>Products List</h2>
 
-        <a asp-action="Create" class="btn btn-primary">
-            + Create New Product
-        </a>
+        @if (Model.SelectedCategoryId.HasValue)
+        {
+            <div class="mt-2">
+
+                <span class="badge bg-secondary fs-6">
+
+                    📂 Category:
+                    @Model.SelectedCategoryName
+
+                </span>
+
+                <a asp-action="Index"
+                   class="btn btn-outline-primary btn-sm ms-2">
+
+                    ← Show All Products
+
+                </a>
+
+            </div>
+        }
+
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create"
+               class="btn btn-primary">
+
+                + Create New Product
+
+            </a>
+        }
 
     </div>
 
@@ -51,13 +78,34 @@
 
                     <td>
 
-                        <a asp-action="Edit"
-                           asp-route-id="@item.Id"
-                           class="btn btn-warning btn-sm">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit"
+                               asp-route-id="@item.Id"
+                               class="btn btn-warning btn-sm">
+                                Edit
+                            </a>
+                        }
+                        else
+                        {
+                            <form asp-controller="Cart"
+                                  asp-action="AddToCart"
+                                  method="post"
+                                  class="d-inline">
 
-                            Edit
+                                <input type="hidden"
+                                       name="productId"
+                                       value="@item.Id" />
 
-                        </a>
+                                <button type="submit"
+                                        class="btn btn-success btn-sm">
+
+                                    🛒 Add To Cart
+
+                                </button>
+
+                            </form>
+                        }
 
                     </td>
 

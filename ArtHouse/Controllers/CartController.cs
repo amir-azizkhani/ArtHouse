@@ -1,6 +1,7 @@
 ﻿using ArtHouse.Data;
 using ArtHouse.Identity;
 using ArtHouse.Models;
+using ArtHouse.ViewModels.Cart;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -73,11 +74,127 @@ namespace ArtHouse.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Index", "Product");
         }
 
 
         #endregion
+
+        #region IncreaseQuantity
+
+        [HttpPost]
+        public async Task<IActionResult> IncreaseQuantity(int cartItemId)
+        {
+            var cartItem = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.Id == cartItemId);
+
+            if (cartItem == null)
+            {
+                return NotFound();
+            }
+
+            cartItem.Quantity++;
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        #endregion
+
+        #region DecreaseQuantity
+
+        [HttpPost]
+        public async Task<IActionResult> DecreaseQuantity(int cartItemId)
+        {
+            var cartItem = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.Id == cartItemId);
+
+            if (cartItem == null)
+            {
+                return NotFound();
+            }
+
+            if (cartItem.Quantity > 1)
+            {
+                cartItem.Quantity--;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        #endregion
+
+        #region
+
+        [HttpPost]
+        public async Task<IActionResult> Remove(int cartItemId)
+        {
+            var cartItem = await _context.CartItems
+                .FirstOrDefaultAsync(ci => ci.Id == cartItemId);
+
+            if (cartItem == null)
+            {
+                return NotFound();
+            }
+
+            _context.CartItems.Remove(cartItem);
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+        #endregion
+
+        #region Index
+
+        public async Task<IActionResult> Index()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return Challenge();
+            }
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .ThenInclude(ci => ci.Product)
+                .FirstOrDefaultAsync(c => c.UserId == user.Id);
+
+            var viewModel = new CartViewModel();
+
+            if (cart == null)
+            {
+                return View(viewModel);
+            }
+
+            foreach (var item in cart.CartItems)
+            {
+                viewModel.Items.Add(new CartItemViewModel
+                {
+                    CartItemId = item.Id,
+                    ProductId = item.ProductId,
+                    ProductTitle = item.Product.Title,
+                    ProductImageUrl = item.Product.ImageUrl,
+                    UnitPrice = item.Product.Price,
+                    Quantity = item.Quantity
+                });
+            }
+
+            return View(viewModel);
+        }
+
+
+        #endregion
+
+
+
 
     }
 }

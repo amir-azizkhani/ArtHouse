@@ -7,5 +7,9 @@
         public string? Search { get; set; }
 
         public int TotalCount { get; set; }
+
+        public int? SelectedCategoryId { get; set; }
+
+        public string? SelectedCategoryName { get; set; }
     }
 }

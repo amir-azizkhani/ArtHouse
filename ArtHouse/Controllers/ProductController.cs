@@ -22,13 +22,18 @@ namespace ArtHouse.Controllers
         }
 
         #region Read
-        public IActionResult Index(string? search)
+        public IActionResult Index(string? search, int? categoryId)
         {
             var query = _context.Products.Include(p => p.Category).AsQueryable();
 
             if (!string.IsNullOrEmpty(search))
             {
                 query = query.Where(p => p.Title.Contains(search));
+            }
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
             }
 
             var products = query
@@ -43,11 +48,23 @@ namespace ArtHouse.Controllers
                 })
                 .ToList();
 
+            string? selectedCategoryName = null;
+
+            if (categoryId.HasValue)
+            {
+                selectedCategoryName = _context.Categories
+                    .Where(c => c.Id == categoryId.Value)
+                    .Select(c => c.Name)
+                    .FirstOrDefault();
+            }
+
             var viewModel = new ProductListViewModel
             {
                 Products = products,
                 Search = search,
-                TotalCount = products.Count
+                TotalCount = products.Count,
+                SelectedCategoryId = categoryId,
+                SelectedCategoryName = selectedCategoryName
             };
 
             return View(viewModel);
