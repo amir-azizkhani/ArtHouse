@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/ArtHouse.styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.min.css" />
 </head>
 <body>
     <header>
@@ -183,29 +182,44 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <div class="toast-container position-fixed top-0 end-0 p-3">
 
         <div id="appToast"
-             class="toast align-items-center text-bg-success border-0"
+             class="toast border-0 shadow"
              role="alert"
              aria-live="assertive"
              aria-atomic="true">
 
-            <div class="d-flex">
+            <div class="toast-header">
 
-                <div id="toastMessage"
-                     class="toast-body">
+                <span id="toastIcon" class="me-2">✅</span>
 
+                <strong id="toastTitle" class="me-auto">
                     Success
+                </strong>
 
-                </div>
+                <small>Now</small>
 
                 <button type="button"
-                        class="btn-close btn-close-white me-2 m-auto"
+                        class="btn-close"
                         data-bs-dismiss="toast">
                 </button>
+
+            </div>
+
+            <div id="toastMessage"
+                 class="toast-body">
+                Operation completed successfully.
+            </div>
+
+            <div class="progress rounded-0" style="height:3px;">
+
+                <div id="toastProgress"
+                     class="progress-bar bg-warning"
+                     role="progressbar"
+                     style="width:100%">
+                </div>
 
             </div>
 
