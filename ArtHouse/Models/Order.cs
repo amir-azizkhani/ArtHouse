@@ -1,5 +1,6 @@
 ﻿using ArtHouse.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
+using ArtHouse.Models.Enums;
 
 namespace ArtHouse.Models
 {
@@ -16,7 +17,7 @@ namespace ArtHouse.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal TotalPrice { get; set; }
 
-        public string Status { get; set; } = "Pending";
+        public OrderStatus Status { get; set; } = OrderStatus.Pending;
 
         public List<OrderItem> OrderItems { get; set; } = new();
     }

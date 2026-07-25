@@ -1,4 +1,23 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+﻿
 
-// Write your JavaScript code.
+
+
+function showToast(message, type = "success") {
+    const toastElement = document.getElementById("appToast");
+    const toastMessage = document.getElementById("toastMessage");
+
+    toastMessage.innerText = message;
+
+    toastElement.classList.remove(
+        "text-bg-success",
+        "text-bg-danger",
+        "text-bg-warning",
+        "text-bg-info"
+    );
+
+    toastElement.classList.add("text-bg-" + type);
+
+    const toast = new bootstrap.Toast(toastElement);
+
+    toast.show();
+}

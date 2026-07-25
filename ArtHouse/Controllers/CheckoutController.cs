@@ -1,6 +1,7 @@
 ﻿using ArtHouse.Data;
 using ArtHouse.Identity;
 using ArtHouse.Models;
+using ArtHouse.Models.Enums;
 using ArtHouse.ViewModels.Orders;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -96,7 +97,8 @@ namespace ArtHouse.Controllers
             {
                 UserId = user.Id,
                 OrderDate = DateTime.Now,
-                TotalPrice = cartItems.Sum(ci => ci.Product.Price * ci.Quantity)
+                TotalPrice = cartItems.Sum(ci => ci.Product.Price * ci.Quantity),
+                Status = OrderStatus.Pending
             };
 
             _context.Orders.Add(order);
