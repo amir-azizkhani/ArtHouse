@@ -30,6 +30,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ImageService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICheckoutService, CheckoutService>();
 
 var app = builder.Build();
 

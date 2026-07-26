@@ -5,7 +5,6 @@ namespace ArtHouse.Services.Interfaces
 {
     public interface IOrderService
     {
-        Task<Order?> CreateOrderAsync(string userId);
 
         Task<bool> UpdateStatusAsync(int orderId, OrderStatus status);
 

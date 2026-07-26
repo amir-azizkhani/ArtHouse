@@ -17,64 +17,6 @@ namespace ArtHouse.Services
         }
 
 
-        #region CreateOrderAsync
-        public async Task<Order?> CreateOrderAsync(string userId)
-        {
-            var cartItems = await _context.CartItems
-                .Include(ci => ci.Product)
-                .Include(ci => ci.Cart)
-                .Where(ci => ci.Cart.UserId == userId)
-                .ToListAsync();
-
-
-            if (!cartItems.Any())
-            {
-                return null;
-            }
-
-
-            var order = new Order
-            {
-                UserId = userId,
-                OrderDate = DateTime.Now,
-                TotalPrice = cartItems.Sum(ci => ci.Product.Price * ci.Quantity)
-            };
-
-
-            _context.Orders.Add(order);
-
-
-            await _context.SaveChangesAsync();
-
-
-
-            foreach (var item in cartItems)
-            {
-                var orderItem = new OrderItem
-                {
-                    OrderId = order.Id,
-                    ProductId = item.ProductId,
-                    Quantity = item.Quantity,
-                    Price = item.Product.Price
-                };
-
-
-                _context.OrderItems.Add(orderItem);
-            }
-
-
-
-            _context.CartItems.RemoveRange(cartItems);
-
-
-            await _context.SaveChangesAsync();
-
-
-
-            return order;
-        }
-        #endregion
-
         #region UpdateStatusAsync
 
 
