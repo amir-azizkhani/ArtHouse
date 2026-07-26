@@ -1,26 +1,24 @@
-﻿using ArtHouse.Data;
-using ArtHouse.Identity;
+﻿using ArtHouse.Identity;
 using ArtHouse.Models;
 using ArtHouse.ViewModels.Cart;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ArtHouse.Services.Interfaces;
 
 namespace ArtHouse.Controllers
 {
     [Authorize]
     public class CartController : Controller
     {
-        private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ICartService _cartService;
 
-        public CartController(
-            AppDbContext context,
-            UserManager<ApplicationUser> userManager)
+        public CartController(UserManager<ApplicationUser> userManager, ICartService cartService)
         {
-            _context = context;
             _userManager = userManager;
+            _cartService = cartService;
         }
 
 
@@ -36,47 +34,12 @@ namespace ArtHouse.Controllers
                 return Challenge();
             }
 
-            var cart = await _context.Carts.Include(c => c.CartItems).FirstOrDefaultAsync(c => c.UserId == user.Id);
 
+            await _cartService.AddToCartAsync(user.Id, productId);
 
-            if (cart == null)
-            {
-                cart = new Cart
-                {
-                    UserId = user.Id
-                };
-
-                _context.Carts.Add(cart);
-
-                await _context.SaveChangesAsync();
-            }
-
-
-            var cartItem = cart.CartItems.FirstOrDefault(ci => ci.ProductId == productId);
-
-
-
-            if (cartItem == null)
-            {
-                cartItem = new CartItem
-                {
-                    CartId = cart.Id,
-                    ProductId = productId,
-                    Quantity = 1
-                };
-
-                _context.CartItems.Add(cartItem);
-            }
-            else
-            {
-                cartItem.Quantity++;
-            }
-
-            await _context.SaveChangesAsync();
 
             return RedirectToAction("Index", "Product");
         }
-
 
         #endregion
 
@@ -85,21 +48,15 @@ namespace ArtHouse.Controllers
         [HttpPost]
         public async Task<IActionResult> IncreaseQuantity(int cartItemId)
         {
-            var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(ci => ci.Id == cartItemId);
+            var result = await _cartService.IncreaseQuantityAsync(cartItemId);
 
-            if (cartItem == null)
+            if (!result)
             {
                 return NotFound();
             }
 
-            cartItem.Quantity++;
-
-            await _context.SaveChangesAsync();
-
             return RedirectToAction(nameof(Index));
         }
-
 
         #endregion
 
@@ -108,20 +65,14 @@ namespace ArtHouse.Controllers
         [HttpPost]
         public async Task<IActionResult> DecreaseQuantity(int cartItemId)
         {
-            var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(ci => ci.Id == cartItemId);
+            var result = await _cartService.DecreaseQuantityAsync(cartItemId);
 
-            if (cartItem == null)
+
+            if (!result)
             {
                 return NotFound();
             }
 
-            if (cartItem.Quantity > 1)
-            {
-                cartItem.Quantity--;
-            }
-
-            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -133,21 +84,17 @@ namespace ArtHouse.Controllers
         [HttpPost]
         public async Task<IActionResult> Remove(int cartItemId)
         {
-            var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(ci => ci.Id == cartItemId);
+            var result = await _cartService.RemoveAsync(cartItemId);
 
-            if (cartItem == null)
+
+            if (!result)
             {
                 return NotFound();
             }
 
-            _context.CartItems.Remove(cartItem);
-
-            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
-
 
         #endregion
 
@@ -157,39 +104,18 @@ namespace ArtHouse.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
+
             if (user == null)
             {
                 return Challenge();
             }
 
-            var cart = await _context.Carts
-                .Include(c => c.CartItems)
-                .ThenInclude(ci => ci.Product)
-                .FirstOrDefaultAsync(c => c.UserId == user.Id);
 
-            var viewModel = new CartViewModel();
+            var model = await _cartService.GetCartAsync(user.Id);
 
-            if (cart == null)
-            {
-                return View(viewModel);
-            }
 
-            foreach (var item in cart.CartItems)
-            {
-                viewModel.Items.Add(new CartItemViewModel
-                {
-                    CartItemId = item.Id,
-                    ProductId = item.ProductId,
-                    ProductTitle = item.Product.Title,
-                    ProductImageUrl = item.Product.ImageUrl,
-                    UnitPrice = item.Product.Price,
-                    Quantity = item.Quantity
-                });
-            }
-
-            return View(viewModel);
+            return View(model);
         }
-
 
         #endregion
 
