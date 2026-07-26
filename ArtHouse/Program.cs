@@ -2,6 +2,7 @@ using ArtHouse.Data;
 using ArtHouse.Data.Seed;
 using ArtHouse.Identity;
 using ArtHouse.Services;
+using ArtHouse.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,6 +29,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ImageService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 var app = builder.Build();
 

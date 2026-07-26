@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ArtHouse.Services.Interfaces;
 
 namespace ArtHouse.Controllers
 {
@@ -13,25 +14,24 @@ namespace ArtHouse.Controllers
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IOrderService _orderService;
 
-        public OrderController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        public OrderController(AppDbContext context, UserManager<ApplicationUser> userManager, IOrderService orderService)
         {
             _context = context;
             _userManager = userManager;
+            _orderService = orderService;
         }
 
         #region Success
         public async Task<IActionResult> Success(int id)
         {
-            var order = await _context.Orders
-                .FirstOrDefaultAsync(o => o.Id == id);
-
+            var order = await _orderService.GetOrderByIdAsync(id);
 
             if (order == null)
             {
                 return NotFound();
             }
-
 
             return View(order);
         }
@@ -47,22 +47,25 @@ namespace ArtHouse.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var orders = await _context.Orders
-                .Where(o => o.UserId == user.Id)
-                .OrderByDescending(o => o.OrderDate)
-                .Select(o => new OrderItemListViewModel
-                {
-                    Id = o.Id,
-                    OrderDate = o.OrderDate,
-                    TotalPrice = o.TotalPrice,
-                    TotalItems = o.OrderItems.Sum(oi => oi.Quantity)
-                })
-                .ToListAsync();
+
+            var orders = await _orderService.GetUserOrdersAsync(user.Id);
+
+
+            var orderViewModels = orders.Select(o => new OrderItemListViewModel
+            {
+                Id = o.Id,
+                OrderDate = o.OrderDate,
+                TotalPrice = o.TotalPrice,
+                TotalItems = o.OrderItems.Sum(oi => oi.Quantity)
+            })
+            .ToList();
+
 
             var model = new OrderListViewModel
             {
-                Orders = orders
+                Orders = orderViewModels
             };
+
 
             return View(model);
         }
@@ -80,41 +83,41 @@ namespace ArtHouse.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var query = _context.Orders.AsQueryable();
 
-            // We use this code that if a user in which they are not an admin they will see only their orders but if ths uder is our admin he can see all the users orders!
-            if (!User.IsInRole("Admin"))
-            {
-                query = query.Where(o => o.UserId == user.Id);
-            }
+            var order = await _orderService.GetOrderByIdAsync(id);
 
-            var order = await query
-                .Where(o => o.Id == id)
-                .Select(o => new OrderDetailsViewModel
-                {
-                    OrderId = o.Id,
-                    OrderDate = o.OrderDate,
-                    TotalPrice = o.TotalPrice,
-
-                    Items = o.OrderItems.Select(oi => new OrderDetailsItemViewModel
-                    {
-                        Title = oi.Product.Title,
-                        ImageUrl = oi.Product.ImageUrl,
-                        Price = oi.Price,
-                        Quantity = oi.Quantity
-                    }).ToList()
-                })
-                .FirstOrDefaultAsync();
 
             if (order == null)
             {
                 return NotFound();
             }
 
-            return View(order);
+
+            // Users can only see their own orders
+            if (!User.IsInRole("Admin") && order.UserId != user.Id)
+            {
+                return NotFound();
+            }
+
+
+            var model = new OrderDetailsViewModel
+            {
+                OrderId = order.Id,
+                OrderDate = order.OrderDate,
+                TotalPrice = order.TotalPrice,
+
+                Items = order.OrderItems.Select(oi => new OrderDetailsItemViewModel
+                {
+                    Title = oi.Product.Title,
+                    ImageUrl = oi.Product.ImageUrl,
+                    Price = oi.Price,
+                    Quantity = oi.Quantity
+                }).ToList()
+            };
+
+
+            return View(model);
         }
-
-
 
         #endregion
 
@@ -123,23 +126,26 @@ namespace ArtHouse.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminOrders()
         {
-            var orders = await _context.Orders
-                .OrderByDescending(o => o.OrderDate)
-                .Select(o => new OrderItemListViewModel
-                {
-                    Id = o.Id,
-                    OrderDate = o.OrderDate,
-                    TotalPrice = o.TotalPrice,
-                    TotalItems = o.OrderItems.Sum(oi => oi.Quantity),
-                    UserName = o.User.UserName!,
-                    Status = o.Status
-                })
-                .ToListAsync();
+            var orders = await _orderService.GetAllOrdersAsync();
+
+
+            var orderViewModels = orders.Select(o => new OrderItemListViewModel
+            {
+                Id = o.Id,
+                OrderDate = o.OrderDate,
+                TotalPrice = o.TotalPrice,
+                TotalItems = o.OrderItems.Sum(oi => oi.Quantity),
+                UserName = o.User.UserName!,
+                Status = o.Status
+            })
+            .ToList();
+
 
             var model = new OrderListViewModel
             {
-                Orders = orders
+                Orders = orderViewModels
             };
+
 
             return View(model);
         }
@@ -153,16 +159,12 @@ namespace ArtHouse.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStatus(int orderId, OrderStatus status)
         {
-            var order = await _context.Orders.FindAsync(orderId);
+            var result = await _orderService.UpdateStatusAsync(orderId, status);
 
-            if (order == null)
+            if (!result)
             {
                 return NotFound();
             }
-
-            order.Status = status;
-
-            await _context.SaveChangesAsync();
 
             return Ok();
         }
