@@ -56,7 +56,8 @@ namespace ArtHouse.Controllers
                 Id = o.Id,
                 OrderDate = o.OrderDate,
                 TotalPrice = o.TotalPrice,
-                TotalItems = o.OrderItems.Sum(oi => oi.Quantity)
+                TotalItems = o.OrderItems.Sum(oi => oi.Quantity),
+                Status = o.Status
             })
             .ToList();
 
